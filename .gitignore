@@ -1,0 +1,10 @@
+node_modules
+npm-debug.log
+coverage*
+.php_cs.cache
+.*.sw?
+assets
+composer.lock
+build
+vendor
+composer.lock
