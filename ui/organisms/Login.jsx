@@ -1,9 +1,6 @@
-
 import React from 'react';
-import FacebookIcon from 'ricon/Facebook';
-import {dispatch, pageStore} from 'reshow';
-import {ajaxStore, ajaxDispatch} from 'organism-react-ajax';
-import userDispatch from '../../src/actions/userDispatcher';
+import {dispatch, pageStore, reshow, ReshowComponent} from 'reshow';
+import get from 'get-object-value';
 
 import {
     Divider,
@@ -22,16 +19,8 @@ import {
     Card
 } from '../molecules/material_card';
 
-
-const FbButton = (props) =>
-    <Button
-        icon={<FacebookIcon />}
-        className="facebook"
-        type="button"
-        {...props}
-    >
-        FACEBOOK CONNECT
-    </Button>
+import {userDispatch} from '../../src/actions/userDispatcher';
+import FbButton from '../molecules/FacebookLoginButton';
 
 const EmailLoginButton = (props) =>
     <Button type="button" {...props}>
@@ -57,7 +46,10 @@ const loginCallback = (response)=>
 {
     console.log('callback', response);
     userDispatch({
-        type: 'login/return'
+        type: 'login/return',
+        params: {
+            code: response.code
+        }
     });
 }
 
@@ -80,7 +72,7 @@ const ThirdPartyLoginForm = (props) =>
     <Card atom="form">              
         <CardTitle>Login</CardTitle>
         <div style={Styles.row}>
-            <FbButton onClick={props.popout}/>
+            <FbButton />
         </div>
         <div style={Styles.row}>
             <EmailLoginButton onClick={handleEmailLogin} />
@@ -118,55 +110,34 @@ class RegisterForm extends React.Component
     }
 }
 
-class Login extends React.Component
+class Login extends ReshowComponent 
 {
 
-    constructor(props)
-    {
-        super(props);
-        this.state = {
-            form: <ThirdPartyLoginForm popout={this.popout.bind(this)}/>
-        };
-    }
-
-    getUrl(path)
-    {
-        return ajaxStore.getRawUrl({
-            path: path
-        });
-    }
-
-    popout()
-    {
-        let win = window;
-        let w = 600;
-        let h = 540;
-        var top  = ((win.innerHeight - h) / 2) + win.screenY; 
-        var left = ((win.innerWidth  - w) / 2) + win.screenX;
-        var openwin = win.open(this.getUrl('/auth/'), '', 
-           'width='+w+
-           ',height='+h+
-           ',top='+top+
-           ',left='+left
-        );
-        let self = this;
-        win.loginReturn = function(){
-        }
-    }
-
+   static get initStates()
+   {
+        return ['isLogin', 'data', 'I18N'];
+   }
 
     render()
     {
+        let form;
+        const {isLogin, data} = get(this, ['state'], {});
+        if (isLogin) {
+            form = <RegisterForm {...data} />;
+        } else {
+            form = <ThirdPartyLoginForm  {...data} />; 
+        }
+
         return (
             <SemanticUI style={Styles.container}>
-              <Card style={Styles.firstCard} />
-              {this.state.form}
+                <Card style={Styles.firstCard} />
+                {form}
             </SemanticUI>
         );
     }
 }
 
-export default Login;
+export default reshow(Login);
 
 const Styles = {
     firstCard: {

@@ -25,6 +25,7 @@ class userStore extends ReduceStore
                 code: action.params.code
             },
             callback: (json, text) => {
+                console.log('login return callback');
                 userDispatch({
                     type: 'login/is-user-exists'
                 });
