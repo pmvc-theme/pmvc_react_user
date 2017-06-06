@@ -1,6 +1,6 @@
 import React from 'react';
 import {mixClass,  reactStyle, SemanticUI} from 'react-atomic-molecule';
-
+import get from 'get-object-value';
 
 export class CardTitle extends React.Component
 {
@@ -18,13 +18,13 @@ export class CardField extends React.Component
    {
       super(props);
       let css = [Styles.cardInputLabel];
-      if (this.props.value) {
+      if (props.value) {
           css = [Styles.cardInputLabel ,Styles.cardInputFocus];
       }
       this.state = {
         css: css,
         barFocus: [],
-        value: this.props.value
+        value: get(props, ['value'], '')
       };
     } 
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import {dispatch, pageStore, reshow, ReshowComponent} from 'reshow';
+import {dispatch, pageStore, reshow, ReshowComponent, ReForm} from 'reshow';
 import get from 'get-object-value';
 
 import {
@@ -55,7 +55,7 @@ const loginCallback = (response)=>
 
 let accountKitInit = false;
 
-const handleEmailLogin = () => {
+const handleAccountKitLogin = () => {
     if (!accountKitInit) {
         const state = pageStore.getState();
         AccountKit.init({
@@ -75,7 +75,7 @@ const ThirdPartyLoginForm = (props) =>
             <FbButton />
         </div>
         <div style={Styles.row}>
-            <EmailLoginButton onClick={handleEmailLogin} />
+            <EmailLoginButton onClick={handleAccountKitLogin} />
         </div>
     </Card>
 
@@ -92,19 +92,18 @@ class RegisterForm extends React.Component
 
     render()
     {
+        const {path} = this.props;
         return (
-              <Card
-                atom="form"
-                ref={dom=>this.form=dom}
-                action={this.props.action}
-              > 
-                  {this.state.alerts}
-                  <CardTitle>ALMOST DONE</CardTitle>
-                  <CardField name="username" label="Choose a username" />
-                  <CardField name="email" label="Enter your email" value={this.props.email}/>
-                  <CardButtons>
-                    <CardButton type="submit">JOIN</CardButton>
-                  </CardButtons>
+              <Card> 
+                  <ReForm path={path} ui={false}>
+                      {this.state.alerts}
+                      <CardTitle>ALMOST DONE</CardTitle>
+                      <CardField name="username" label="Choose a username" />
+                      <CardField name="email" label="Enter your email" />
+                      <CardButtons>
+                        <CardButton type="submit">JOIN</CardButton>
+                      </CardButtons>
+                   </ReForm>
               </Card>
         )
     }
@@ -122,8 +121,9 @@ class Login extends ReshowComponent
     {
         let form;
         const {isLogin, data} = get(this, ['state'], {});
+        const {registerActionPath} = get(data, null, {})
         if (isLogin) {
-            form = <RegisterForm {...data} />;
+            form = <RegisterForm {...data} path={registerActionPath} />;
         } else {
             form = <ThirdPartyLoginForm  {...data} />; 
         }
