@@ -17,15 +17,15 @@ class userStore extends ReduceStore
 
   loginReturn(state, action)
   {
+    const params = action.params;
     ajaxDispatch({
         type: 'ajaxPost',
         params: {
-            path: '/auth/login-return', 
+            path: '/auth/login-return/'+params.providerId, 
             query: {
-                code: action.params.code
+                code: params.code
             },
             callback: (json, text) => {
-                console.log('login return callback');
                 userDispatch({
                     type: 'login/is-user-exists'
                 });

@@ -1,5 +1,5 @@
 import React from 'react';
-import {mixClass,  reactStyle, SemanticUI} from 'react-atomic-molecule';
+import {mixClass,  reactStyle, Message, SemanticUI} from 'react-atomic-molecule';
 import get from 'get-object-value';
 
 export class CardTitle extends React.Component
@@ -14,6 +14,11 @@ export class CardTitle extends React.Component
 
 export class CardField extends React.Component
 {
+   static defaultProps = {
+        type: "text",
+        required: "required"
+   };
+
    constructor(props)
    {
       super(props);
@@ -30,49 +35,53 @@ export class CardField extends React.Component
 
     render()
     {
+        const {id, label, messageType, message, refCb, ...props} = this.props;
+        let messageEl;
+        if (message) {
+           messageEl = <Message messageType={messageType}>{message}</Message>;
+        }
         return (
-            <SemanticUI styles={Styles.cardFieldContainer} ui={false}>
-                <SemanticUI {...this.props}
-                        atom="input"
-                        value={this.state.value}
-                        refCb={el=>this.el=el}
-                        styles={Styles.cardInput} 
-                        onFocus={()=>{
-                            this.setState({
-                                css:[Styles.cardInputLabel, Styles.cardInputFocus],
-                                barFocus: [Styles.inputBarStartFocus]
-                            });
-                        }}
-                        onBlur={()=>{
-                            let css = [Styles.cardInputLabel];
-                            let len = this.el.value.length;
-                            if (len) {
-                                css = [Styles.cardInputLabel ,Styles.cardInputFocus];
-                            }
-                            this.setState({
-                                css:css,
-                                barFocus: []
-                            });
-                        }}
-                        onChange={(e)=>{
-                            this.setState({
-                                value: e.target.value 
-                            });
-                        }}
-                />
-                <SemanticUI atom="label" htmlFor={this.props.id} styles={this.state.css}>{this.props.label}</SemanticUI>
-                <SemanticUI styles={Styles.cardInputBar}>
-                     <SemanticUI styles={this.state.barFocus} style={{...Styles.inputBarFocus,...Styles.inputBarLeft}} />
-                     <SemanticUI styles={this.state.barFocus} style={{...Styles.inputBarFocus,...Styles.inputBarRight}} />
+            <SemanticUI style={Styles.cardFieldContainer} className="field" ui={false}>
+                <SemanticUI className="inner" style={Styles.cardFieldInner}>
+                    <SemanticUI {...props}
+                            atom="input"
+                            value={this.state.value}
+                            refCb={el=>{this.el=el;refCb(el);}}
+                            styles={Styles.cardInput} 
+                            onFocus={()=>{
+                                this.setState({
+                                    css:[Styles.cardInputLabel, Styles.cardInputFocus],
+                                    barFocus: [Styles.inputBarStartFocus]
+                                });
+                            }}
+                            onBlur={()=>{
+                                let css = [Styles.cardInputLabel];
+                                let len = this.el.value.length;
+                                if (len) {
+                                    css = [Styles.cardInputLabel ,Styles.cardInputFocus];
+                                }
+                                this.setState({
+                                    css:css,
+                                    barFocus: []
+                                });
+                            }}
+                            onChange={(e)=>{
+                                this.setState({
+                                    value: e.target.value 
+                                });
+                            }}
+                    />
+                    <SemanticUI atom="label" htmlFor={id} styles={this.state.css}>{label}</SemanticUI>
+                    <SemanticUI styles={Styles.cardInputBar}>
+                         <SemanticUI styles={this.state.barFocus} style={{...Styles.inputBarFocus,...Styles.inputBarLeft}} />
+                         <SemanticUI styles={this.state.barFocus} style={{...Styles.inputBarFocus,...Styles.inputBarRight}} />
+                    </SemanticUI>
                 </SemanticUI>
+                {messageEl}
             </SemanticUI>
         )
     }
 }
-CardField.defaultProps = {
-    type: "text",
-    required: "required"
-};
 
 export class CardButtons extends React.Component
 {
@@ -196,10 +205,12 @@ const Styles = {
         fontWeight: '700',
         textTransform: 'uppercase',
     }),
-    cardFieldContainer: reactStyle({
-        position: 'relative',
+    cardFieldContainer: {
         margin: '0 60px 50px'
-    }),
+    },
+    cardFieldInner: {
+        position: 'relative'
+    },
     cardInput: reactStyle({
         outline: 'none',
         zIndex: 1,

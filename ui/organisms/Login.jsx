@@ -1,5 +1,5 @@
 import React from 'react';
-import {dispatch, pageStore, reshow, ReshowComponent, ReForm} from 'reshow';
+import {reshow, ReshowComponent, ReForm} from 'reshow';
 import get from 'get-object-value';
 
 import {
@@ -20,13 +20,8 @@ import {
 } from '../molecules/material_card';
 
 import {userDispatch} from '../../src/actions/userDispatcher';
-import FbButton from '../molecules/FacebookLoginButton';
-
-const EmailLoginButton = (props) =>
-    <Button type="button" {...props}>
-        Use Email Login
-    </Button>
-
+import FbButton from '../organisms/FacebookLoginButton';
+import AccountKit from '../organisms/AccountKit';
 
 const UserPasswordLoginForm = (props) =>
      <Card atom="form">              
@@ -41,65 +36,74 @@ const UserPasswordLoginForm = (props) =>
          </CardFooter>
      </Card>
 
-
-const loginCallback = (response)=>
-{
-    console.log('callback', response);
-    userDispatch({
-        type: 'login/return',
-        params: {
-            code: response.code
-        }
-    });
-}
-
-let accountKitInit = false;
-
-const handleAccountKitLogin = () => {
-    if (!accountKitInit) {
-        const state = pageStore.getState();
-        AccountKit.init({
-            appId: state.get('accountKitAppId'),
-            state: 'test',
-            version: state.get('accountKitVersion')
-        });
-        accountKitInit = true;
-    }
-    AccountKit.login('EMAIL', {emailAddress: ''}, loginCallback);
+const ThirdPartyLoginForm = ({
+    accountKitAppId,
+    accountKitVersion,
+    I18N_Default,
+    I18N,
+    ...props
+}) => {
+    I18N = {...I18N_Default, ...I18N};
+    return (
+        <Card>
+            <CardTitle>Login</CardTitle>
+            <div style={Styles.buttonRow}>
+                <FbButton style={Styles.button}/>
+            </div>
+            <Divider className="horizontal">{I18N.or}</Divider>
+            <AccountKit
+                I18N={I18N}
+                accountKitAppId={accountKitAppId}
+                accountKitVersion={accountKitVersion}
+            />
+        </Card>
+    );
 };
-
-const ThirdPartyLoginForm = (props) =>
-    <Card atom="form">              
-        <CardTitle>Login</CardTitle>
-        <div style={Styles.row}>
-            <FbButton />
-        </div>
-        <div style={Styles.row}>
-            <EmailLoginButton onClick={handleAccountKitLogin} />
-        </div>
-    </Card>
+ThirdPartyLoginForm.defaultProps = {
+    I18N_Default: {
+        or: 'OR'
+    }
+};
 
 
 class RegisterForm extends React.Component
 {
+    handleErrors = (json, text, response) =>
+    {
+        let alerts = {type: {}, message: {}};
+        const errors = get(json,['data', 'errors']);
+        errors.forEach((item)=>{
+            const field = get(item, ['field']);
+            alerts.type[field]='error';
+            alerts.message[field]=get(item, ['message']);
+        });
+        this.setState({alerts: alerts});
+    }
+
     constructor(props)
     {
         super(props);
         this.state = {
-            alerts: [] 
+            alerts: {}
         }
     }
 
     render()
     {
         const {path} = this.props;
+        const alerts = this.state.alerts;
         return (
               <Card> 
-                  <ReForm path={path} ui={false}>
-                      {this.state.alerts}
+                  <ReForm path={path} ui={false} errorCallback={this.handleErrors}>
                       <CardTitle>ALMOST DONE</CardTitle>
-                      <CardField name="username" label="Choose a username" />
-                      <CardField name="email" label="Enter your email" />
+                      <CardField name="username" label="Choose a username"
+                        messageType={get(alerts, ['type', 'username'])}
+                        message={get(alerts, ['message', 'username'])}
+                      />
+                      <CardField name="email" label="Enter your email"
+                        messageType={get(alerts, ['type', 'email'])}
+                        message={get(alerts, ['message', 'email'])}
+                      />
                       <CardButtons>
                         <CardButton type="submit">JOIN</CardButton>
                       </CardButtons>
@@ -119,13 +123,13 @@ class Login extends ReshowComponent
 
     render()
     {
-        let form;
-        const {isLogin, data} = get(this, ['state'], {});
+        const {isLogin, data, I18N} = get(this, ['state'], {});
         const {registerActionPath} = get(data, null, {})
+        let form;
         if (isLogin) {
-            form = <RegisterForm {...data} path={registerActionPath} />;
+            form = <RegisterForm {...data}  path={registerActionPath} />;
         } else {
-            form = <ThirdPartyLoginForm  {...data} />; 
+            form = <ThirdPartyLoginForm {...data} I18N={I18N}/>; 
         }
 
         return (
@@ -153,8 +157,11 @@ const Styles = {
         width: '100%',
         margin: '100px auto 100px',
     },
-    row: {
-        marginBottom: 10,
-        textAlign: 'center'
+    buttonRow: {
+        maxWidth: '80%',
+        margin: '0 auto'
+    },
+    button: {
+        width: '100%'
     }
 };

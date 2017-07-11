@@ -11,10 +11,10 @@ import {ajaxStore} from 'organism-react-ajax';
 
 const keys=Object.keys;
 
-const popout = () =>
+const popout = (providerId) =>
 {
     const url = ajaxStore.getRawUrl({
-        path: '/auth/'
+        path: '/auth/'+providerId
     });
     let win = window;
     let w = 600;
@@ -46,6 +46,6 @@ const FbButton = (props) =>
     </Button>
 
 const FacebookLoginButton = (props)=>
-<FbButton onClick={popout} />
+<FbButton {...props} onClick={popout.bind(this,'facebook')} />
 
 export default FacebookLoginButton;
