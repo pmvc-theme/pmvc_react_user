@@ -16,7 +16,8 @@ export class CardField extends React.Component
 {
    static defaultProps = {
         type: "text",
-        required: "required"
+        required: "required",
+        refCb: ()=>{}
    };
 
    constructor(props)

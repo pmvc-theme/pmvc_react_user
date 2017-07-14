@@ -27,7 +27,7 @@ class userStore extends ReduceStore
             },
             callback: (json, text) => {
                 userDispatch({
-                    type: 'login/is-user-exists'
+                    type: 'login/home'
                 });
             }
         }
@@ -35,37 +35,14 @@ class userStore extends ReduceStore
     return state;
   }
 
-  isUserExists(state, action)
+  goToHome(state, action)
   {
     ajaxDispatch({
-        type: 'ajaxPost',
+        type: 'ajaxGet',
         params: {
-            path: '/user/is-exists', 
-            callback: (json, text) => {
-                  if (json.isExists) {
-                        userDispatch({
-                            type: 'config/set',
-                            params: {
-                                loginStep: 'success' 
-                            }
-                        });
-                  } else {
-                        userDispatch({
-                            type: 'config/set',
-                            params: {
-                                loginStep: 'register' 
-                            }
-                        });
-                  }
-            }
+            path: '/user', 
         }
     });
-    return state;
-  }
-
-  register(state, action)
-  {
-
     return state;
   }
 
@@ -73,12 +50,10 @@ class userStore extends ReduceStore
   {
       switch (action.type)
       {
-          case 'login/register':
-              return this.register(state, action); 
           case 'login/return':
               return this.loginReturn(state, action); 
-          case 'login/is-user-exists':
-              return this.isUserExists(state, action); 
+          case 'login/home':
+              return this.goToHome(state, action); 
           case 'config/set':
               return state.merge(action.params);
           default:

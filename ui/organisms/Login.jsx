@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {PureComponent} from 'react';
 import {reshow, ReshowComponent, ReForm} from 'reshow';
 import get from 'get-object-value';
 
@@ -90,19 +90,20 @@ class RegisterForm extends React.Component
 
     render()
     {
-        const {path} = this.props;
+        const {path, email} = this.props;
         const alerts = this.state.alerts;
         return (
               <Card> 
                   <ReForm path={path} ui={false} errorCallback={this.handleErrors}>
                       <CardTitle>ALMOST DONE</CardTitle>
-                      <CardField name="username" label="Choose a username"
-                        messageType={get(alerts, ['type', 'username'])}
-                        message={get(alerts, ['message', 'username'])}
+                      <CardField name="legalName" label="Choose a username"
+                        messageType={get(alerts, ['type', 'legalName'])}
+                        message={get(alerts, ['message', 'legalName'])}
                       />
                       <CardField name="email" label="Enter your email"
                         messageType={get(alerts, ['type', 'email'])}
                         message={get(alerts, ['message', 'email'])}
+                        value={email}
                       />
                       <CardButtons>
                         <CardButton type="submit">JOIN</CardButton>
@@ -113,23 +114,45 @@ class RegisterForm extends React.Component
     }
 }
 
+class Welcome extends PureComponent  
+{
+    render()
+    {
+        const {welcome} = this.props;
+        return (
+            <Card> 
+                <ReForm path='/user/logout' method="get" updateUrl={true} ui={false}>
+                    <CardTitle>{welcome}</CardTitle>
+                    <CardButtons>
+                        <CardButton type="submit">Logout</CardButton>
+                    </CardButtons>
+                </ReForm>
+            </Card>
+        );
+    }
+}
+
 class Login extends ReshowComponent 
 {
 
    static get initStates()
    {
-        return ['isLogin', 'data', 'I18N'];
+        return ['isLogin', 'isRegistered', 'data', 'I18N'];
    }
 
     render()
     {
-        const {isLogin, data, I18N} = get(this, ['state'], {});
+        const {isLogin, isRegistered, data, I18N} = get(this, ['state'], {});
         const {registerActionPath} = get(data, null, {})
         let form;
         if (isLogin) {
-            form = <RegisterForm {...data}  path={registerActionPath} />;
+            if (isRegistered) {
+                form = <Welcome {...data} I18N={I18N} />; 
+            } else {
+                form = <RegisterForm {...data} I18N={I18N} path={registerActionPath} />;
+            }
         } else {
-            form = <ThirdPartyLoginForm {...data} I18N={I18N}/>; 
+            form = <ThirdPartyLoginForm {...data} I18N={I18N} />; 
         }
 
         return (
