@@ -1,0 +1,79 @@
+<html>
+<?php if ($this->get('autoClose')) { ?>
+<script>
+if(window.opener && window.opener.loginReturn){
+    window.opener.loginReturn();
+}
+setTimeout(function(){
+    window.close();
+},<?php echo $this->get('sec')?>000);
+</script>
+<?php }?>
+<head>
+<?php
+    $css = [ 'message', 'button' ];
+    foreach($css as $v) {
+        echo '<link rel="stylesheet" type="text/css" href="//cdn-htlovestory.netdna-ssl.com/cdn/cdn.css?lib/semantic-ui/2.2.2/'.$v.'.css">';
+        flush();
+    }
+?>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+<?php if ($this->get('success')) { ?>
+<div class="ui message">
+<?php echo str_replace(
+    '[sec]',
+    '<span id="sec">'.$this->get('sec').'</span>',
+    $this->get('I18N')[$this->get('success')]
+)?>
+</div>
+<?php }?>
+
+<?php if ($this->get('failed')) { ?>
+<div class="ui message">
+<?php echo str_replace(
+    '[sec]',
+    '<span id="sec">'.$this->get('sec').'</span>',
+    $this->get('I18N')[$this->get('failed')]
+)?>
+</div>
+<?php }?>
+
+<?php if ($this->get('info')) { ?>
+<div class="ui message">
+<?php echo str_replace(
+    '[sec]',
+    '<span id="sec">'.$this->get('sec').'</span>',
+    $this->get('I18N')[$this->get('info')]
+)?>
+</div>
+<?php }?>
+
+<?php if ($this->get('autoClose')) { ?>
+<div style="text-align:center">
+<button onclick="window.close();" class="ui button center">
+    Close window
+</button>
+</div>
+<?php }?>
+
+<?php if ($this->get('sec')) { ?>
+<script>
+setInterval(function(){
+    var oSec = document.getElementById('sec');
+    var sec = oSec.innerHTML;
+    sec--;
+    oSec.innerHTML=sec;
+}, 1000);
+</script>
+<?php }?>
+
+</body>
+</html>
+
+<?php if ($this->get('redirectUrl')) { ?>
+<script>
+document.location.replace('<?php echo $this->get('redirectUrl')?>');
+</script>
+<?php }?>

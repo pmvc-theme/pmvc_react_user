@@ -66,7 +66,7 @@ ThirdPartyLoginForm.defaultProps = {
 };
 
 
-class RegisterForm extends React.Component
+class RegisterForm extends PureComponent
 {
     handleErrors = (json, text, response) =>
     {
@@ -90,7 +90,7 @@ class RegisterForm extends React.Component
 
     render()
     {
-        const {path, email} = this.props;
+        const {path, email, legalName} = this.props;
         const alerts = this.state.alerts;
         return (
               <Card> 
@@ -99,6 +99,7 @@ class RegisterForm extends React.Component
                       <CardField name="legalName" label="Choose a username"
                         messageType={get(alerts, ['type', 'legalName'])}
                         message={get(alerts, ['message', 'legalName'])}
+                        value={legalName}
                       />
                       <CardField name="email" label="Enter your email"
                         messageType={get(alerts, ['type', 'email'])}
@@ -137,15 +138,15 @@ class Login extends ReshowComponent
 
    static get initStates()
    {
-        return ['isLogin', 'isRegistered', 'data', 'I18N'];
+        return ['isAuth', 'isRegistered', 'data', 'I18N'];
    }
 
     render()
     {
-        const {isLogin, isRegistered, data, I18N} = get(this, ['state'], {});
+        const {isAuth, isRegistered, data, I18N} = get(this, ['state'], {});
         const {registerActionPath} = get(data, null, {})
         let form;
-        if (isLogin) {
+        if (isAuth) {
             if (isRegistered) {
                 form = <Welcome {...data} I18N={I18N} />; 
             } else {

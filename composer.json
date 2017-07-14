@@ -1,0 +1,17 @@
+{
+    "name": "pmvc-theme/pmvc_react_user",
+    "description": "Auth / User theme",
+    "type": "library",
+    "keywords": ["theme", "pmvc"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Hill",
+            "email": "hill@kimo.com"
+        }
+    ],
+    "require": {
+        "pmvc-plugin/view_html": "*"
+    },
+    "minimum-stability": "dev"
+}
