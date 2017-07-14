@@ -9,6 +9,8 @@ import {
 
 import {ajaxStore} from 'organism-react-ajax';
 
+import {userDispatch} from '../../src/actions/userDispatcher';
+
 const keys=Object.keys;
 
 const popout = (providerId) =>
@@ -32,6 +34,9 @@ const popout = (providerId) =>
     }).join(',');
     let openwin = win.open(url, '', textPaams);
     win.loginReturn = () => {
+        userDispatch({
+            type: 'login/home'
+        });
     }
 }
 
